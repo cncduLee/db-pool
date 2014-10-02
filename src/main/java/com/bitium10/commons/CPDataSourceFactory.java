@@ -1,5 +1,11 @@
 package com.bitium10.commons;
 
+import org.apache.ibatis.datasource.DataSourceFactory;
+
+import javax.sql.DataSource;
+import java.util.Properties;
+import java.util.Map;
+
 /**
  * <b>项目名</b>： db-pool <br>
  * <b>包名称</b>： com.bitium10.commons <br>
@@ -13,5 +19,16 @@ package com.bitium10.commons;
  *
  * @version 1.0.0 <br>
  */
-public class CPDataSourceFactory extends CPDataSource implements DataSourceF {
+public class CPDataSourceFactory extends CPDataSource implements DataSourceFactory {
+    @Override
+    public DataSource getDataSource() {
+        return this;
+    }
+
+    public void initialize(Map map) {
+        Properties prop = new Properties();
+        prop.putAll(map);
+
+        setProperties(prop);
+    }
 }
