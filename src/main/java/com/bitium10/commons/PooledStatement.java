@@ -1,14 +1,14 @@
 package com.bitium10.commons;
 
+import com.bitium10.commons.utils.JdbcUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
+import java.lang.reflect.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Formatter;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -99,7 +99,7 @@ public class PooledStatement implements InvocationHandler {
             return obj;
         } catch (SQLException e) {
             if (this.methodDoing.startsWith("execute")) {
-                log.error(new Object[]{e.toString(), "[ErrorCode=", Integer.valueOf(e.getErrorCode()), ";SQLState=", e.getSQLState(), "] on ", this.methodDoing, "(", getSqlDoing(), ")"});
+                log.error(")");
             }
             if (this.connection.isFetalException(e)) {
                 close();
@@ -133,7 +133,7 @@ public class PooledStatement implements InvocationHandler {
                     this.connection.checkIn(this);
                 }
                 if (isVerbose())
-                    log.all(new Object[]{this.statementName, ".close() use ", Formatter.formatNS(System.nanoTime() - start), " ns"});
+                    log.debug(" ns");
             } else if ((this.methodDoing.equals("addBatch")) && (args != null) && (args.length == 1)) {
                 this.sqlDoing = ((String) args[0]);
                 this.real_statement.addBatch((String) args[0]);
@@ -157,7 +157,7 @@ public class PooledStatement implements InvocationHandler {
             } else {
                 ret = method.invoke(this.real_statement, args);
                 if (isVerbose())
-                    log.all(new Object[]{this.statementName, ".", this.methodDoing, "(...) use ", Formatter.formatNS(System.nanoTime() - start), " ns"});
+                    log.debug(" ns");
             }
         } catch (InvocationTargetException e) {
             throw e.getCause();
@@ -171,12 +171,12 @@ public class PooledStatement implements InvocationHandler {
         }
         if (usedNS / 1000L <= this.connection.getInfoSQLThreshold() * 1000L) {
             if (logger.isDebugEnabled())
-                logger.debug(new Object[]{getStatementName(), ".", this.methodDoing, "(", getSqlDoing(), ")", infos, " use ", Formatter.formatNS(usedNS), " ns"});
+                logger.debug(" ns");
         } else if (usedNS / 1000L <= this.connection.getWarnSQLThreshold() * 1000L) {
             if (logger.isInfoEnabled())
-                logger.info(new Object[]{getStatementName(), ".", this.methodDoing, "(", getSqlDoing(), ")", infos, infos, " use ", Formatter.formatNS(usedNS), " ns"});
+                logger.debug(" ns");
         } else if (logger.isWarnEnabled())
-            logger.warn(new Object[]{getStatementName(), ".", this.methodDoing, "(", getSqlDoing(), ")", infos, infos, " use ", Formatter.formatNS(usedNS), " ns"});
+            logger.debug(" ns");
     }
 
     protected String getSqlDoing() {
@@ -211,7 +211,7 @@ public class PooledStatement implements InvocationHandler {
             this.real_statement.close();
         } catch (SQLException e) {
         }
-        log.debug(new Object[]{this.statementName, " real closed."});
+        log.debug(" real closed.");
     }
 
     public String getStatementName() {
@@ -237,11 +237,11 @@ public class PooledStatement implements InvocationHandler {
         if ((this.checkOut.get()) && (this.busying > 0L)) {
             long usedNS = System.nanoTime() - this.busying;
             if ((usedNS / 1000L <= this.connection.getInfoSQLThreshold() * 1000L) && (log.isDebugEnabled()))
-                log.debug(new Object[]{this.statementName, " invoking ", this.methodDoing, "(", getSqlDoing(), ")", " use ", Formatter.formatNS(usedNS), " ns"});
+                log.debug(" ns");
             else if ((usedNS / 1000L <= this.connection.getWarnSQLThreshold() * 1000L) && (log.isInfoEnabled()))
-                log.info(new Object[]{this.statementName, " invoking ", this.methodDoing, "(", getSqlDoing(), ")", " use ", Formatter.formatNS(usedNS), " ns"});
+                log.debug(" ns");
             else if (log.isWarnEnabled()) {
-                log.warn(new Object[]{this.statementName, " invoking ", this.methodDoing, "(", getSqlDoing(), ")", " use ", Formatter.formatNS(usedNS), " ns"});
+                log.debug(" ns");
             }
             return true;
         }
@@ -254,12 +254,5 @@ public class PooledStatement implements InvocationHandler {
 
     public long getTimeCheckIn() {
         return this.timeCheckIn;
-    }
-
-}
-
-    @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        return null;
     }
 }
