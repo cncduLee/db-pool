@@ -1,16 +1,21 @@
 package com.bitium10.commons;
 
+import com.bitium10.commons.impl.CP;
 import com.bitium10.commons.impl.CPConfigImpl;
 
 import javax.naming.Context;
 import javax.naming.Name;
+import javax.naming.RefAddr;
+import javax.naming.Reference;
 import javax.naming.spi.ObjectFactory;
 import javax.sql.DataSource;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
+import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Properties;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Logger;
@@ -28,10 +33,10 @@ import java.util.logging.Logger;
  *
  * @version 1.0.0 <br>
  */
-public class CPDataSource extends CPConfigImpl implements DataSource,ObjectFactory {
+public class CPDataSource extends CPConfigImpl implements DataSource, ObjectFactory {
     private ReadWriteLock rwl = new ReentrantReadWriteLock();
 
-    private WangyinCP pool = null;
+    private CP pool = null;
     private PrintWriter logWriter = null;
 
     public PrintWriter getLogWriter() throws SQLException {
@@ -48,31 +53,26 @@ public class CPDataSource extends CPConfigImpl implements DataSource,ObjectFacto
     }
 
     public <T> T unwrap(Class<T> iface)
-            throws SQLException
-    {
+            throws SQLException {
         return null;
     }
 
-    public boolean isWrapperFor(Class<?> iface) throws SQLException
-    {
+    public boolean isWrapperFor(Class<?> iface) throws SQLException {
         return false;
     }
 
-    public Object getObjectInstance(Object object, Name name, Context nameCtx, Hashtable<?, ?> environment) throws Exception
-    {
-        Reference ref = (Reference)object;
+    public Object getObjectInstance(Object object, Name name, Context nameCtx, Hashtable<?, ?> environment) throws Exception {
+        Reference ref = (Reference) object;
         Enumeration addrs = ref.getAll();
         Properties props = new Properties();
         while (addrs.hasMoreElements()) {
-            RefAddr addr = (RefAddr)addrs.nextElement();
-            if ((addr.getType().equals("driverClassName")) || (addr.getType().equals("driver")))
-            {
-                Class.forName((String)addr.getContent());
-            }
-            else props.put(addr.getType(), addr.getContent());
+            RefAddr addr = (RefAddr) addrs.nextElement();
+            if ((addr.getType().equals("driverClassName")) || (addr.getType().equals("driver"))) {
+                Class.forName((String) addr.getContent());
+            } else props.put(addr.getType(), addr.getContent());
         }
 
-        WangyinCPDataSource ds = new WangyinCPDataSource();
+        CPDataSource ds = new CPDataSource();
         ds.setProperties(props);
         return ds;
     }
@@ -88,24 +88,21 @@ public class CPDataSource extends CPConfigImpl implements DataSource,ObjectFacto
         throw new UnsupportedOperationException("getConnection(username, password) is unsupported.");
     }
 
-    private void maybeInit() throws SQLException
-    {
+    private void maybeInit() throws SQLException {
         try {
             this.rwl.readLock().lock();
             if (this.pool == null) {
                 this.rwl.readLock().unlock();
                 this.rwl.writeLock().lock();
                 try {
-                    if (this.pool == null)
-                    {
-                        this.pool = new WangyinCP(this);
+                    if (this.pool == null) {
+                        this.pool = new CP(this);
                     }
                 } finally {
                     this.rwl.readLock().lock();
                 }
             }
-        }
-        finally {
+        } finally {
             this.rwl.readLock().unlock();
         }
     }

@@ -1,6 +1,5 @@
-package com.bitium10.commons.impl;
+package com.bitium10.commons;
 
-import com.bitium10.commons.CPConfig;
 import com.bitium10.commons.utils.JdbcUtil;
 import com.bitium10.commons.utils.StringUtils;
 import org.apache.commons.codec.binary.Base64;

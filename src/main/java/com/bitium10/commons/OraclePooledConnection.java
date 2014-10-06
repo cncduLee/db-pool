@@ -1,7 +1,5 @@
 package com.bitium10.commons;
 
-import com.bitium10.commons.impl.CP;
-
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 

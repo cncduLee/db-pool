@@ -1,11 +1,9 @@
-package com.bitium10.commons.impl;
+package com.bitium10.commons;
 
-import com.bitium10.commons.*;
 import com.bitium10.commons.log.Logger;
 import com.bitium10.commons.utils.Formatter;
 import com.bitium10.commons.utils.JMXUtil;
 import com.bitium10.commons.utils.JdbcUtil;
-
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,12 +13,12 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.Map;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 

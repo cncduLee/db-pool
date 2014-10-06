@@ -1,24 +1,23 @@
 package com.bitium10.commons;
 
-import com.bitium10.commons.impl.CP;
 import com.bitium10.commons.log.Logger;
 import com.bitium10.commons.log.LoggerFactory;
+import com.bitium10.commons.utils.Formatter;
 import com.bitium10.commons.utils.JMXUtil;
 import com.bitium10.commons.utils.JdbcUtil;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.lang.reflect.Proxy;
+import java.sql.*;
 import java.util.LinkedHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.*;
+import java.util.Map;
 
 /**
  * <b>项目名</b>： db-pool <br>
@@ -50,7 +49,7 @@ public class PooledConnection implements InvocationHandler, PooledConnectionMBea
     private AtomicInteger validStatementNum = new AtomicInteger(0);
     private LinkedBlockingQueue<PooledStatement> idleStatementsPool;
     private ConcurrentHashMap<Integer, PooledStatement> activeStatementsPool;
-    private LinkedHashMap<String, PooledPreparedStatement> validPreStatementsPool;
+    private LinkedHashMap validPreStatementsPool;
     private AtomicBoolean closed = new AtomicBoolean(true);
 
     private final ReentrantLock operLock = new ReentrantLock();
@@ -59,18 +58,22 @@ public class PooledConnection implements InvocationHandler, PooledConnectionMBea
 
     private boolean dirty = false;
 
+
     PooledConnection(CP pool, int connId) throws SQLException {
         this.connectionPool = pool;
         this.connectionId = connId;
         this.connectionName = (pool.getPoolName() + "#" + connId);
         this.idleStatementsPool = new LinkedBlockingQueue(this.connectionPool.getConfig().getMaxStatements());
         this.activeStatementsPool = new ConcurrentHashMap(this.connectionPool.getConfig().getMaxStatements());
-        this.validPreStatementsPool = new LinkedHashMap(this.connectionPool.getConfig().getMaxPreStatements() + 1, 0.75F, true) {
+        this.validPreStatementsPool = new LinkedHashMap(
+            this.connectionPool.getConfig().getMaxPreStatements() + 1, 0.75F,
+            true) {
             private static final long serialVersionUID = -5350521942562100031L;
 
-            protected boolean removeEldestEntry(Map.Entry<String, PooledPreparedStatement> eldest) {
+            @Override
+            protected boolean removeEldestEntry(Map.Entry eldest) {
                 if (size() > PooledConnection.this.connectionPool.getConfig().getMaxPreStatements()) {
-                    PooledPreparedStatement ppstmt = (PooledPreparedStatement) eldest.getValue();
+                    PooledPreparedStatement ppstmt = (PooledPreparedStatement)eldest.getValue();
                     if (ppstmt.isCheckOut()) {
                         return false;
                     }
@@ -80,10 +83,11 @@ public class PooledConnection implements InvocationHandler, PooledConnectionMBea
                 return false;
             }
         };
-        makeRealConnection();
-        this.connection = buildProxy();
-        if (pool.getConfig().getJmxLevel() > 1)
-            JMXUtil.register(getClass().getPackage().getName() + ":type=pool-" + pool.getPoolName() + ",name=" + getConnectionName(), this);
+
+            makeRealConnection();
+            this.connection = buildProxy();
+            if (pool.getConfig().getJmxLevel() > 1)
+                JMXUtil.register(getClass().getPackage().getName() + ":type=pool-" + pool.getPoolName() + ",name=" + getConnectionName(), this);
     }
 
     private void makeRealConnection() throws SQLException {
