@@ -1,4 +1,4 @@
-package commons.log;
+package com.bitium10.commons.log;
 
 import com.bitium10.commons.utils.Formatter;
 

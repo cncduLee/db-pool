@@ -1,4 +1,4 @@
-package commons;
+package com.bitium10.commons;
 
 import com.bitium10.commons.log.Logger;
 import com.bitium10.commons.utils.Formatter;
@@ -293,16 +293,14 @@ public class CP implements ConnectPool {
                 if (this.config.isOracle()) {
                     pconn = new OraclePooledConnection(this, connId.intValue());
                 } else {
-//                    PooledConnection pconn;
-//                    if (this.config.isMySQL()) {
-//                        pconn = new MySQLPooledConnection(this, connId.intValue());
-//                    } else {
-//                        PooledConnection pconn;
-//                        if (this.config.isDB2())
-//                            pconn = new DB2PooledConnection(this, connId.intValue());
-//                        else
-//                            pconn = new PooledConnection(this, connId.intValue());
-//                    }
+                    if (this.config.isMySQL()) {
+                        pconn = new MySqlPooledConnection(this, connId.intValue());
+                    } else {
+                        if (this.config.isDB2())
+                            pconn = new DB2PooledConnection(this, connId.intValue());
+                        else
+                            pconn = new PooledConnection(this, connId.intValue());
+                    }
                 }
                 this.validConnectionsPool.put(connId, pconn);
                 if (directReturn) {

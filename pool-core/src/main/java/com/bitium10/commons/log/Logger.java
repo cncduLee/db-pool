@@ -1,4 +1,4 @@
-package commons.log;
+package com.bitium10.commons.log;
 
 /**
  * <b>项目名</b>： com.bitium10.commons <br>

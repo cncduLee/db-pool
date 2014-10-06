@@ -1,4 +1,4 @@
-package commons;
+package com.bitium10.commons;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;

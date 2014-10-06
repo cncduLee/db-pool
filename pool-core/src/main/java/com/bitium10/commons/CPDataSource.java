@@ -1,4 +1,4 @@
-package commons;
+package com.bitium10.commons;
 
 import javax.naming.Context;
 import javax.naming.Name;

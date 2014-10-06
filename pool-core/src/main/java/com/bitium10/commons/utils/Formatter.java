@@ -1,4 +1,4 @@
-package commons.utils;
+package com.bitium10.commons.utils;
 
 /**
  * <b>项目名</b>： com.bitium10.commons <br>

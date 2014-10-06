@@ -1,4 +1,4 @@
-package commons.utils;
+package com.bitium10.commons.utils;
 
 import javax.management.*;
 import java.lang.management.ManagementFactory;

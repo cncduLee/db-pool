@@ -1,4 +1,4 @@
-package commons.log;
+package com.bitium10.commons.log;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;

@@ -1,4 +1,4 @@
-package commons;
+package com.bitium10.commons;
 
 /**
  * <b>项目名</b>： db-pool <br>

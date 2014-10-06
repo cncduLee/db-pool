@@ -1,4 +1,4 @@
-package commons;
+package com.bitium10.commons;
 
 import java.lang.reflect.Proxy;
 import java.sql.CallableStatement;

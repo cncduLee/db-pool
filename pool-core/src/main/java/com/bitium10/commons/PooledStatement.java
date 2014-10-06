@@ -1,4 +1,4 @@
-package commons;
+package com.bitium10.commons;
 
 import com.bitium10.commons.utils.JdbcUtil;
 import org.slf4j.Logger;

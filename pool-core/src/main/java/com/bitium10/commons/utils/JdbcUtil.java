@@ -1,4 +1,4 @@
-package commons.utils;
+package com.bitium10.commons.utils;
 
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;

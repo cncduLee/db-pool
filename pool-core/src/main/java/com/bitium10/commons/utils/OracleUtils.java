@@ -1,4 +1,4 @@
-package commons.utils;
+package com.bitium10.commons.utils;
 
 import oracle.jdbc.internal.OraclePreparedStatement;
 import org.slf4j.Logger;
